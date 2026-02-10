@@ -159,6 +159,25 @@ Bridge research → production for GenAI systems:
 
 ---
 
+### 9. Multimodal RAG System
+**Problem**: Search and answer questions over documents with text AND images
+
+**Features**:
+- CLIP-based image embeddings
+- Unified text + image retrieval
+- Vision-language model integration (GPT-4V, Claude 3)
+- Multi-modal reranking
+- Image captioning for context
+
+**Tech**: CLIP, GPT-4V/Claude 3 Vision, FAISS, OCR
+
+**Highlights**:
+- 88% retrieval accuracy (text+image)
+- Handles PDFs, slides, diagrams
+- Image-aware question answering
+
+---
+
 ## 🛠 Common Patterns
 
 ### RAG Architecture
