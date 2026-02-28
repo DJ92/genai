@@ -1,0 +1,36 @@
+{
+  "name": "web_fetch",
+  "description": "Fetch web content from approved hosts",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "HTTP URL"
+      },
+      "timeout_seconds": {
+        "type": "integer",
+        "default": 15
+      }
+    },
+    "required": ["url"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string"
+      },
+      "status_code": {
+        "type": "integer"
+      },
+      "body": {
+        "type": "string"
+      }
+    },
+    "required": ["url", "status_code", "body"]
+  },
+  "required_capabilities": ["web_fetch"],
+  "requires_network_egress": true,
+  "allowed_hosts": ["example.com", "api.example.com"]
+}

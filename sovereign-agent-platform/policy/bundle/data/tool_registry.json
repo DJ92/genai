@@ -1,0 +1,22 @@
+{
+  "tools": {
+    "files_search": {
+      "required_capabilities": ["files_search"],
+      "dangerous": false,
+      "requires_network_egress": false,
+      "allowed_hosts": []
+    },
+    "files_read_chunk": {
+      "required_capabilities": ["files_read_chunk"],
+      "dangerous": false,
+      "requires_network_egress": false,
+      "allowed_hosts": []
+    },
+    "web_fetch": {
+      "required_capabilities": ["web_fetch"],
+      "dangerous": true,
+      "requires_network_egress": true,
+      "allowed_hosts": ["example.com", "api.example.com"]
+    }
+  }
+}

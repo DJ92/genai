@@ -1,0 +1,41 @@
+{
+  "name": "files_read_chunk",
+  "description": "Fetch specific chunk with provenance",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "chunk_id": {
+        "type": "string",
+        "description": "Chunk identifier"
+      }
+    },
+    "required": ["chunk_id"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "chunk_id": {
+        "type": "string"
+      },
+      "content": {
+        "type": "string"
+      },
+      "document_title": {
+        "type": "string"
+      },
+      "source_uri": {
+        "type": "string"
+      },
+      "offset_start": {
+        "type": "integer"
+      },
+      "offset_end": {
+        "type": "integer"
+      }
+    },
+    "required": ["chunk_id", "content", "source_uri"]
+  },
+  "required_capabilities": ["files_read_chunk"],
+  "requires_network_egress": false,
+  "allowed_hosts": []
+}

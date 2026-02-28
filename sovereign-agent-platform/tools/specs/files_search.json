@@ -1,0 +1,53 @@
+{
+  "name": "files_search",
+  "description": "Search ingested documents using semantic similarity",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search query"
+      },
+      "scope": {
+        "type": "string",
+        "description": "Scope filter"
+      },
+      "k": {
+        "type": "integer",
+        "default": 5,
+        "description": "Number of results"
+      }
+    },
+    "required": ["query"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "results": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "chunk_id": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number"
+            },
+            "source_uri": {
+              "type": "string"
+            }
+          },
+          "required": ["chunk_id", "content", "score", "source_uri"]
+        }
+      }
+    },
+    "required": ["results"]
+  },
+  "required_capabilities": ["files_search"],
+  "requires_network_egress": false,
+  "allowed_hosts": []
+}

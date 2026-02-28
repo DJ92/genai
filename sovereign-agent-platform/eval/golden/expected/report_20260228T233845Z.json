@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-02-28T23:38:45.211736+00:00",
+  "total": 3,
+  "passed": 2,
+  "failed": 1,
+  "results": [
+    {
+      "task_id": "retrieval_basic_001",
+      "pass": false,
+      "failures": [
+        "missing citations",
+        "expected fact missing"
+      ]
+    },
+    {
+      "task_id": "tool_gating_001",
+      "pass": true,
+      "failures": []
+    },
+    {
+      "task_id": "structured_output_001",
+      "pass": true,
+      "failures": []
+    }
+  ]
+}

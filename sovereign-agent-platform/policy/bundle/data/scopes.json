@@ -1,0 +1,16 @@
+{
+  "scopes": {
+    "personal": {
+      "description": "Personal documents",
+      "sensitivity": "low"
+    },
+    "work": {
+      "description": "Work documents",
+      "sensitivity": "medium"
+    },
+    "financial": {
+      "description": "Financial documents",
+      "sensitivity": "high"
+    }
+  }
+}

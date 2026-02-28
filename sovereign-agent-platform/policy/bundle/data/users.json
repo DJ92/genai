@@ -1,0 +1,8 @@
+{
+  "users": {
+    "dj": {
+      "roles": ["admin", "user"],
+      "capabilities": ["files_search", "files_read_chunk", "web_fetch"]
+    }
+  }
+}
