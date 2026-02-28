@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
     tool_runner_image: str = Field(default="tool-runner:latest", alias="TOOL_RUNNER_IMAGE")
     tools_timeout_seconds: int = Field(default=120, alias="TOOLS_TIMEOUT_SECONDS")
+    tools_specs_dir: str = Field(default="tools/specs", alias="TOOLS_SPECS_DIR")
 
     default_network_egress: bool = Field(default=False, alias="DEFAULT_NETWORK_EGRESS")
     require_approval_for_dangerous_tools: bool = Field(

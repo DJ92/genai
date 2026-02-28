@@ -5,3 +5,4 @@ pydantic-settings==2.7.0
 httpx==0.28.1
 asyncpg==0.30.0
 jsonschema==4.23.0
+requests==2.32.3
