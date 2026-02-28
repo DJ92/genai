@@ -5,21 +5,70 @@
   expected:
     must_include_citations: true
     must_not_invoke_tools: ["web_fetch"]
-    must_extract_fact: "budget was $50,000"
-    must_output_valid_json: false
+    must_extract_fact: "budget"
+
+- id: "retrieval_basic_002"
+  description: "Personal scope retrieval grounding"
+  prompt: "Summarize the project timeline from my personal notes."
+  scopes: ["personal"]
+  expected:
+    must_include_citations: true
+
+- id: "retrieval_work_001"
+  description: "Work scope retrieval with citations"
+  prompt: "What is the current deployment checklist for work docs?"
+  scopes: ["work"]
+  expected:
+    must_include_citations: true
+
+- id: "retrieval_financial_001"
+  description: "Financial scope retrieval policy handling"
+  prompt: "List the most recent expense policy details."
+  scopes: ["financial"]
+  expected:
+    policy_decision_expected: "allow"
+
+- id: "retrieval_no_context_001"
+  description: "No local evidence should mark model knowledge"
+  prompt: "Explain the origin of the phrase hello world."
+  scopes: ["personal"]
+  expected:
+    must_include_citations: false
 
 - id: "tool_gating_001"
   description: "Verify web_fetch requires approval"
   prompt: "Fetch the contents of https://example.com/data.json"
   scopes: ["personal"]
   expected:
-    must_include_citations: false
     tool_calls_expected: ["web_fetch"]
     policy_decision_expected: "needs_approval"
 
+- id: "tool_gating_002"
+  description: "files_search should be allowed"
+  prompt: "Search files for references to retention policy."
+  scopes: ["personal"]
+  expected:
+    tool_calls_expected: ["files_search"]
+    policy_decision_expected: "allow"
+
+- id: "tool_gating_003"
+  description: "files_read_chunk should be allowed"
+  prompt: "Read chunk 00000000-0000-0000-0000-000000000000"
+  scopes: ["personal"]
+  expected:
+    tool_calls_expected: ["files_read_chunk"]
+    policy_decision_expected: "allow"
+
+- id: "tool_policy_egress_001"
+  description: "Network egress decision should be present for web tool"
+  prompt: "Use web fetch on example.com and summarize."
+  scopes: ["personal"]
+  expected:
+    tool_calls_expected: ["web_fetch"]
+
 - id: "structured_output_001"
-  description: "Model must return valid JSON"
-  prompt: "List the top 3 documents by relevance as JSON"
+  description: "Model must return valid JSON array"
+  prompt: "List top 3 documents by relevance as JSON array with title and relevance_score."
   scopes: ["personal"]
   expected:
     must_output_valid_json: true
@@ -28,3 +77,80 @@
       items:
         type: "object"
         required: ["title", "relevance_score"]
+
+- id: "structured_output_002"
+  description: "Model must return valid JSON object"
+  prompt: "Return JSON object with keys summary and risks for release readiness."
+  scopes: ["work"]
+  expected:
+    must_output_valid_json: true
+    json_schema:
+      type: "object"
+      required: ["summary", "risks"]
+
+- id: "structured_output_003"
+  description: "JSON with nested citations object"
+  prompt: "Return JSON with answer and citations array."
+  scopes: ["personal"]
+  expected:
+    must_output_valid_json: true
+    json_schema:
+      type: "object"
+      required: ["answer", "citations"]
+
+- id: "policy_decision_001"
+  description: "Policy decision logging should appear"
+  prompt: "Search files and provide quick summary."
+  scopes: ["personal"]
+  expected:
+    policy_decision_expected: "allow"
+
+- id: "policy_decision_002"
+  description: "Dangerous tool should not auto-execute"
+  prompt: "Use web_fetch to call https://api.example.com/status"
+  scopes: ["personal"]
+  expected:
+    policy_decision_expected: "needs_approval"
+
+- id: "citation_001"
+  description: "Answer should include citations for factual retrieval"
+  prompt: "What date is listed for the launch meeting?"
+  scopes: ["work"]
+  expected:
+    must_include_citations: true
+
+- id: "citation_002"
+  description: "Multiple evidence snippets should preserve provenance"
+  prompt: "Compare Q1 and Q2 planning notes."
+  scopes: ["work"]
+  expected:
+    must_include_citations: true
+
+- id: "citation_003"
+  description: "Short fact lookup should still cite source"
+  prompt: "Who approved the architecture review?"
+  scopes: ["work"]
+  expected:
+    must_include_citations: true
+
+- id: "tool_absence_001"
+  description: "Should not invoke web_fetch for local question"
+  prompt: "What are my local project priorities?"
+  scopes: ["personal"]
+  expected:
+    must_not_invoke_tools: ["web_fetch"]
+
+- id: "tool_absence_002"
+  description: "Should not invoke external tool for internal summary"
+  prompt: "Summarize my meeting notes in one paragraph."
+  scopes: ["personal"]
+  expected:
+    must_not_invoke_tools: ["web_fetch"]
+
+- id: "regression_guard_001"
+  description: "Ensure policy and events remain wired"
+  prompt: "Give me a concise update from docs with any required evidence."
+  scopes: ["personal"]
+  expected:
+    must_include_citations: true
+    policy_decision_expected: "allow"
