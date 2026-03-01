@@ -12,8 +12,61 @@ def _response_text(response: dict) -> str:
     return str(response.get("response", ""))
 
 
+def _basic_validate_schema(value, schema: dict) -> tuple[bool, str | None]:
+    schema_type = schema.get("type")
+    if schema_type == "object":
+        if not isinstance(value, dict):
+            return False, "expected object"
+        required = schema.get("required", [])
+        for key in required:
+            if key not in value:
+                return False, f"missing required key: {key}"
+        properties = schema.get("properties", {})
+        for key, prop_schema in properties.items():
+            if key in value and isinstance(prop_schema, dict):
+                ok, err = _basic_validate_schema(value[key], prop_schema)
+                if not ok:
+                    return False, f"{key}: {err}"
+        return True, None
+    if schema_type == "array":
+        if not isinstance(value, list):
+            return False, "expected array"
+        item_schema = schema.get("items")
+        if isinstance(item_schema, dict):
+            for idx, item in enumerate(value):
+                ok, err = _basic_validate_schema(item, item_schema)
+                if not ok:
+                    return False, f"item[{idx}]: {err}"
+        return True, None
+    if schema_type == "string" and not isinstance(value, str):
+        return False, "expected string"
+    if schema_type == "number" and not isinstance(value, (int, float)):
+        return False, "expected number"
+    if schema_type == "integer" and not isinstance(value, int):
+        return False, "expected integer"
+    if schema_type == "boolean" and not isinstance(value, bool):
+        return False, "expected boolean"
+    return True, None
+
+
 def _event_payloads(events: list[dict], event_type: str) -> list[dict]:
-    return [event.get("payload", {}) for event in events if event.get("event_type") == event_type]
+    payloads: list[dict] = []
+    for event in events:
+        if event.get("event_type") != event_type:
+            continue
+        payload = event.get("payload", {})
+        if isinstance(payload, str):
+            try:
+                parsed = json.loads(payload)
+                if isinstance(parsed, dict):
+                    payload = parsed
+                else:
+                    payload = {}
+            except json.JSONDecodeError:
+                payload = {}
+        if isinstance(payload, dict):
+            payloads.append(payload)
+    return payloads
 
 
 def score_task(task: dict, response: dict, events: list[dict]) -> dict:
@@ -42,7 +95,9 @@ def score_task(task: dict, response: dict, events: list[dict]) -> dict:
         schema = expected.get("json_schema")
         if schema is not None and parsed is not None:
             if jsonschema is None:
-                failures.append("jsonschema package missing for schema validation")
+                ok, err = _basic_validate_schema(parsed, schema)
+                if not ok:
+                    failures.append(f"json schema validation failed: {err}")
             else:
                 try:
                     jsonschema.validate(parsed, schema)

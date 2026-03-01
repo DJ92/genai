@@ -92,12 +92,26 @@ async def run() -> int:
                     }
                     events: list[dict] = []
                 else:
-                    response, events = await _run_live_task(
-                        task,
-                        gateway_url=args.gateway_url,
-                        client=client,
-                        connection=connection,
-                    )
+                    try:
+                        response, events = await _run_live_task(
+                            task,
+                            gateway_url=args.gateway_url,
+                            client=client,
+                            connection=connection,
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        response = {"trace_id": None, "response": "", "citations": []}
+                        events = []
+                        results.append(
+                            {
+                                "task_id": task["id"],
+                                "description": task.get("description", ""),
+                                "trace_id": None,
+                                "pass": False,
+                                "failures": [f"task execution error: {exc}"],
+                            }
+                        )
+                        continue
 
                 verdict = score_task(task, response, events)
                 results.append(
@@ -137,4 +151,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

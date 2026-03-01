@@ -13,7 +13,17 @@ from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
-ROOT_DIR = Path(__file__).resolve().parents[4]
+
+def _detect_root_dir() -> Path:
+    current = Path(__file__).resolve()
+    for parent in [current, *current.parents]:
+        if (parent / "tools").exists() and (parent / "tools" / "specs").exists():
+            return parent
+    # Fallback for local development where cwd is project root.
+    return Path.cwd()
+
+
+ROOT_DIR = _detect_root_dir()
 
 
 class ToolRouter:

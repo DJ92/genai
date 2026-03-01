@@ -12,7 +12,7 @@ from app.core.config import get_settings
 class OpenAICompatibleAdapter:
     def __init__(self) -> None:
         self._settings = get_settings()
-        self._timeout = httpx.Timeout(120.0)
+        self._timeout = httpx.Timeout(2.0)
 
     def _headers(self) -> dict:
         headers = {"Content-Type": "application/json"}
@@ -20,7 +20,7 @@ class OpenAICompatibleAdapter:
             headers["Authorization"] = f"Bearer {self._settings.model_backend_api_key}"
         return headers
 
-    async def _post(self, path: str, payload: dict, retries: int = 3) -> tuple[dict, int]:
+    async def _post(self, path: str, payload: dict, retries: int = 1) -> tuple[dict, int]:
         url = f"{self._settings.model_backend_base_url.rstrip('/')}{path}"
         last_error: Exception | None = None
         for attempt in range(retries):
@@ -34,7 +34,7 @@ class OpenAICompatibleAdapter:
             except Exception as exc:  # noqa: BLE001
                 last_error = exc
                 if attempt < retries - 1:
-                    await asyncio.sleep(2**attempt)
+                    await asyncio.sleep(0.2)
         if last_error is None:
             raise RuntimeError("unknown backend error")
         raise last_error
@@ -97,4 +97,3 @@ class OpenAICompatibleAdapter:
             "model": raw.get("model"),
             "usage": raw.get("usage", {}),
         }
-

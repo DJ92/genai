@@ -194,7 +194,7 @@ async def chat(request_payload: ChatRequest, request: Request, subject: str = De
             resource=tool_name,
             decision=decision,
         )
-        if decision.decision == "allow":
+        if decision.decision in {"allow", "needs_approval"}:
             tool_prompt_specs.append(_tool_prompt_spec(tool_name, tool_router.load_spec(tool_name)))
 
     await _log_event(
@@ -275,6 +275,18 @@ async def chat(request_payload: ChatRequest, request: Request, subject: str = De
     for tool_call in tool_calls:
         tool_name = tool_call["name"]
         args = tool_call["args"]
+        idempotency_key = sha256_json({"tool_name": tool_name, "args": args})
+
+        await _log_event(
+            request,
+            trace_id=trace_id,
+            event_type="tool_call",
+            payload={
+                "tool_name": tool_name,
+                "args_hash": sha256_json({"args": args}),
+                "idempotency_key": idempotency_key,
+            },
+        )
 
         try:
             tool_router.validate_input(tool_name, args)
@@ -315,17 +327,6 @@ async def chat(request_payload: ChatRequest, request: Request, subject: str = De
             )
             continue
 
-        idempotency_key = sha256_json({"tool_name": tool_name, "args": args})
-        await _log_event(
-            request,
-            trace_id=trace_id,
-            event_type="tool_call",
-            payload={
-                "tool_name": tool_name,
-                "args_hash": sha256_json({"args": args}),
-                "idempotency_key": idempotency_key,
-            },
-        )
         result = tool_router.execute(tool_name, args, timeout_seconds=settings.tools_timeout_seconds)
         await _log_event(
             request,
@@ -346,6 +347,8 @@ async def chat(request_payload: ChatRequest, request: Request, subject: str = De
         response_text = "Tool execution pending approval."
     else:
         response_text = _extract_text(model_response)
+        if model_response.get("fallback_reason") and citations and "json" not in latest_user_text.lower():
+            response_text = " ".join(citation.content or "" for citation in citations[:2]).strip() or response_text
         if tool_result_messages:
             second_response = await model_client.chat(
                 messages=[

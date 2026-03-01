@@ -91,7 +91,17 @@ async def run_workflow(
     require_approval_for_dangerous_tools: bool,
     log_event: EventLogger,
 ) -> WorkflowResult:
-    job_state = job.get("state") or {}
+    raw_state = job.get("state")
+    if isinstance(raw_state, str):
+        try:
+            parsed = json.loads(raw_state)
+            job_state = parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            job_state = {}
+    elif isinstance(raw_state, dict):
+        job_state = raw_state
+    else:
+        job_state = {}
     request_text = job_state.get("request", f"Run workflow {job.get('workflow_name')}")
     owner_subject = f"user:{job.get('owner', 'dj')}"
 
@@ -247,4 +257,3 @@ async def run_workflow(
             "summary": summary_text,
         },
     )
-

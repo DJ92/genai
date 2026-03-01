@@ -3,7 +3,7 @@ package agent.network_egress
 import rego.v1
 
 tool_name := object.get(input.context, "tool_name", "")
-tool := data.tool_registry.tools[tool_name]
+tool := data.tools[tool_name]
 host := input.resource
 
 allow if {

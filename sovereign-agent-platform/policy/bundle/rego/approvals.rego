@@ -7,7 +7,7 @@ import data.agent.network_egress
 
 requires_dangerous_tool_approval if {
   input.action == "tool.invoke"
-  tool := data.tool_registry.tools[input.resource]
+  tool := data.tools[input.resource]
   object.get(tool, "dangerous", false)
   object.get(input.context, "require_approval_for_dangerous_tools", true)
 }
@@ -30,7 +30,7 @@ decision := {
   "decision": "allow",
   "reason": tool_access.reason,
   "constraints": {
-    "allowed_hosts": object.get(data.tool_registry.tools[input.resource], "allowed_hosts", [])
+    "allowed_hosts": object.get(data.tools[input.resource], "allowed_hosts", [])
   }
 } if {
   input.action == "tool.invoke"
@@ -74,7 +74,7 @@ decision := {
   "decision": "allow",
   "reason": network_egress.reason,
   "constraints": {
-    "allowed_hosts": object.get(data.tool_registry.tools[tool_name], "allowed_hosts", [])
+    "allowed_hosts": object.get(data.tools[tool_name], "allowed_hosts", [])
   }
 } if {
   input.action == "network.egress"

@@ -27,13 +27,26 @@ async def _release_connection(request: Request, connection: asyncpg.Connection, 
 
 
 def _row_to_job_response(row: asyncpg.Record) -> JobResponse:
+    raw_state = row["state"]
+    if isinstance(raw_state, str):
+        try:
+            state = json.loads(raw_state)
+            if not isinstance(state, dict):
+                state = {}
+        except json.JSONDecodeError:
+            state = {}
+    elif isinstance(raw_state, dict):
+        state = raw_state
+    else:
+        state = {}
+
     return JobResponse(
         id=str(row["id"]),
         owner=row["owner"],
         workflow_name=row["workflow_name"],
         status=row["status"],
         priority=row["priority"],
-        state=row["state"] or {},
+        state=state,
     )
 
 
@@ -127,4 +140,3 @@ async def cancel_job(job_id: str, request: Request) -> dict:
     if row is None:
         raise HTTPException(status_code=409, detail="job cannot be cancelled in current status")
     return {"id": str(row["id"]), "status": row["status"]}
-

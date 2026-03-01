@@ -3,10 +3,10 @@ package agent.data_scopes
 import rego.v1
 
 user_id(subject) := split(subject, ":")[1]
-user := data.users.users[user_id(input.subject)]
+user := data.users[user_id(input.subject)]
 
 requested_scopes := object.get(input.context, "request_scopes", ["personal"])
-all_scopes := [scope | data.scopes.scopes[scope]]
+all_scopes := [scope | data.scopes[scope]]
 
 user_scopes := all_scopes if {
   "admin" in object.get(user, "roles", [])

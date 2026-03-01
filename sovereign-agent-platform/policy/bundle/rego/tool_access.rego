@@ -4,8 +4,8 @@ import rego.v1
 
 user_id(subject) := split(subject, ":")[1]
 
-tool := data.tool_registry.tools[input.resource]
-user := data.users.users[user_id(input.subject)]
+tool := data.tools[input.resource]
+user := data.users[user_id(input.subject)]
 
 has_required_capabilities if {
   required := object.get(tool, "required_capabilities", [])

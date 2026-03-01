@@ -2,11 +2,19 @@ SHELL := /bin/bash
 
 .PHONY: dev-up dev-down reset-db test eval milestone-a-test compose-config
 
+DOCKER ?= docker
+DOCKER_APP_BIN := /Applications/Docker.app/Contents/Resources/bin/docker
+ifeq ($(shell command -v $(DOCKER) >/dev/null 2>&1; echo $$?),1)
+	ifneq ("$(wildcard $(DOCKER_APP_BIN))","")
+		DOCKER := $(DOCKER_APP_BIN)
+	endif
+endif
+
 dev-up:
-	docker compose up -d --build
+	$(DOCKER) compose up -d --build
 
 dev-down:
-	docker compose down -v
+	$(DOCKER) compose down -v
 
 reset-db:
 	./scripts/reset_db.sh
@@ -18,8 +26,8 @@ eval:
 	python -m eval.harness.run_golden --output eval/golden/expected
 
 milestone-a-test:
-	docker compose up -d postgres opa
+	$(DOCKER) compose up -d postgres opa
 	curl -sS http://localhost:8181/v1/data/agent/decision | jq .
 
 compose-config:
-	docker compose config
+	$(DOCKER) compose config
