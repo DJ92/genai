@@ -2,6 +2,11 @@ SHELL := /bin/bash
 
 .PHONY: dev-up dev-down reset-db test eval milestone-a-test compose-config
 
+DOCKER_APP_DIR := /Applications/Docker.app/Contents/Resources/bin
+ifneq ("$(wildcard $(DOCKER_APP_DIR)/docker)","")
+	export PATH := $(DOCKER_APP_DIR):$(PATH)
+endif
+
 DOCKER ?= docker
 DOCKER_APP_BIN := /Applications/Docker.app/Contents/Resources/bin/docker
 ifeq ($(shell command -v $(DOCKER) >/dev/null 2>&1; echo $$?),1)
@@ -23,6 +28,7 @@ test:
 	./scripts/run_tests.sh
 
 eval:
+	./scripts/seed_eval_data.sh
 	python -m eval.harness.run_golden --output eval/golden/expected
 
 milestone-a-test:
