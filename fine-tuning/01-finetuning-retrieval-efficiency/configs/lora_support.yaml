@@ -1,0 +1,20 @@
+data:
+  path: ../../data/techqa_support.jsonl
+  split_column: split
+  question_column: question
+  answer_column: answer
+  doc_id_column: doc_id
+  doc_title_column: doc_title
+  doc_text_column: document_text
+model:
+  train_dim: 768
+  hidden_dim: 64
+  rank: 8
+training:
+  seed: 11
+  epochs: 60
+  learning_rate: 0.05
+  checkpoint_dir: artifacts
+retrieval:
+  dims: [768, 384, 256]
+  top_k: 3

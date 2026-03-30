@@ -8,9 +8,9 @@ This repository contains practical GenAI applications and research experiments, 
 
 Bridge research → production for GenAI systems:
 - **Production Patterns**: RAG, agents, tool use, guardrails
-- **Optimization**: Latency, cost, quality trade-offs
+- **Optimization**: Latency, cost, quality, and retrieval-efficiency trade-offs
 - **Evaluation**: Automated metrics, LLM-as-judge, human eval
-- **Real-world Use Cases**: Search, customer support, code generation
+- **Real-world Use Cases**: Search, customer support, code generation, and domain Q&A
 
 ## 📂 Projects
 
@@ -175,6 +175,24 @@ Bridge research → production for GenAI systems:
 - 88% retrieval accuracy (text+image)
 - Handles PDFs, slides, diagrams
 - Image-aware question answering
+
+---
+
+### 10. Fine-Tuning + Retrieval Efficiency Lab
+**Problem**: Improve narrow-domain Q&A quality while reducing retrieval latency and memory footprint
+
+**Components**:
+- LoRA-style query adapter on top of a frozen encoder
+- Compact retrieval indexes at `768`, `384`, and `256` dimensions
+- Base vs adapted answer-quality comparisons
+- End-to-end retrieval plus reranking evaluation
+
+**Tech**: PyTorch, NumPy, YAML
+
+**Highlights**:
+- Public-safe stand-in for internal Q&A fine-tuning
+- Retrieval benchmarks across multiple embedding sizes
+- End-to-end evaluation that ties retrieval efficiency to answer accuracy
 
 ---
 
