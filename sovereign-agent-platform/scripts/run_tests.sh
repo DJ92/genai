@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python -m compileall services eval tools
-python -m eval.harness.run_golden --dry-run
+python -m compileall platform_core services eval tools tests
+pytest tests -q
+python -m eval.harness.run_golden --output eval/golden/expected

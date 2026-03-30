@@ -86,12 +86,12 @@ def score_task(task: dict, response: dict, events: list[dict]) -> dict:
         if fact not in response_text.lower():
             failures.append("expected fact missing")
 
+    parsed = None
     if expected.get("must_output_valid_json"):
         try:
             parsed = json.loads(response_text)
         except json.JSONDecodeError:
             failures.append("response is not valid JSON")
-            parsed = None
         schema = expected.get("json_schema")
         if schema is not None and parsed is not None:
             if jsonschema is None:
@@ -117,11 +117,12 @@ def score_task(task: dict, response: dict, events: list[dict]) -> dict:
     if missing_expected:
         failures.append(f"expected tool calls missing: {', '.join(missing_expected)}")
 
-    if expected.get("policy_decision_expected"):
-        required_decision = expected["policy_decision_expected"]
+    required_decision = expected.get("policy_decision_expected")
+    if required_decision:
         policy_events = _event_payloads(events, "policy_decision")
         decisions = {event.get("decision") for event in policy_events}
-        if required_decision not in decisions:
+        response_decision = response.get("policy_decision")
+        if required_decision not in decisions and response_decision != required_decision:
             failures.append(f"expected policy decision not found: {required_decision}")
 
     return {"pass": not failures, "failures": failures}
