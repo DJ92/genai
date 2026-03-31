@@ -14,7 +14,7 @@ from services.gateway.app import post_chat
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run golden task harness")
-    parser.add_argument("--tasks", default="eval/golden/tasks.yaml")
+    parser.add_argument("--tasks", default="eval/golden/platform_tasks.yaml")
     parser.add_argument("--output", default="eval/golden/expected")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()

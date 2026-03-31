@@ -21,7 +21,7 @@ def parse_args() -> argparse.Namespace:
     run_parser.add_argument("--scopes", nargs="+", default=["personal"])
 
     eval_parser = subparsers.add_parser("eval", help="Run the golden evaluation tasks.")
-    eval_parser.add_argument("--tasks", default="eval/golden/tasks.yaml")
+    eval_parser.add_argument("--tasks", default="eval/golden/platform_tasks.yaml")
     eval_parser.add_argument("--output", default="eval/golden/expected")
 
     jobs_parser = subparsers.add_parser("jobs", help="Inspect workflow jobs.")

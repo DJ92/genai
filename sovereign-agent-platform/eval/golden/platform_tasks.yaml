@@ -1,0 +1,29 @@
+- id: "retrieval_basic_001"
+  description: "Basic retrieval from personal docs"
+  prompt: "What did the meeting notes from January say about the budget?"
+  scopes: ["personal"]
+  expected:
+    must_include_citations: true
+    must_not_invoke_tools: ["web_fetch"]
+    must_extract_fact: "budget was $50,000"
+
+- id: "tool_gating_001"
+  description: "Verify web_fetch requires approval"
+  prompt: "Fetch the contents of https://example.com/data.json"
+  scopes: ["personal"]
+  expected:
+    must_include_citations: false
+    tool_calls_expected: ["web_fetch"]
+    policy_decision_expected: "needs_approval"
+
+- id: "structured_output_001"
+  description: "Model must return valid JSON"
+  prompt: "List the top 3 documents by relevance as JSON"
+  scopes: ["personal"]
+  expected:
+    must_output_valid_json: true
+    json_schema:
+      type: "array"
+      items:
+        type: "object"
+        required: ["title", "relevance_score"]
